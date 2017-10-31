@@ -1,3 +1,10 @@
+/*
+ 作者：  吴定如 <wudr@dist.com.cn>
+ 文件：  DistImagePickerView
+ 版本：  1.0.0
+ 地址：  https://github.com/Damsir/DistImagePickerView
+ 描述：  集本地图片、视频选取,展示,拍摄,录像于一体的并时刻回调用于上传的数据类型的多媒体框架
+ */
 
 #import <UIKit/UIKit.h>
 #import "DistImagePickerModel.h"
@@ -16,7 +23,7 @@ typedef void(^DistImagePickerHeightBlock)(CGFloat height);
 
 typedef void(^DistSelecttImageBackBlock)(NSArray<DistImagePickerModel *> *list);
 
-// 负责展示的V
+// 负责展示的View
 @interface DistImagePickerView : UIView
 
 /**
@@ -78,7 +85,12 @@ typedef void(^DistSelecttImageBackBlock)(NSArray<DistImagePickerModel *> *list);
  @param count countOfRow
  @return instance
  */
-+ (instancetype)ImagePickerViewWithFrame:(CGRect)frame CountOfRow:(NSInteger)count;
++ (instancetype)imagePickerViewWithFrame:(CGRect)frame countOfRow:(NSInteger)count;
+
+/**
+ * add media action (outside method)
+ */
+- (void)addMedia;
 
 /**
  * 刷新

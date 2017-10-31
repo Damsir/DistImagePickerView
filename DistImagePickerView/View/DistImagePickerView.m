@@ -1,4 +1,10 @@
-
+/*
+ 作者：  吴定如 <wudr@dist.com.cn>
+ 文件：  DistImagePickerView
+ 版本：  1.0.0
+ 地址：  https://github.com/Damsir/DistImagePickerView
+ 描述：  集本地图片、视频选取,展示,拍摄,录像于一体的并时刻回调用于上传的数据类型的多媒体框架
+ */
 
 #import "DistImagePickerView.h"
 #import "DistImagePickerCell.h"
@@ -150,15 +156,16 @@ static NSInteger countOfRow;
     _backBlock = backBlock;
 }
 
-+ (instancetype)ImagePickerViewWithFrame:(CGRect)frame CountOfRow:(NSInteger)count{
+#pragma mark -- init
+
++ (instancetype)imagePickerViewWithFrame:(CGRect)frame countOfRow:(NSInteger)count{
     countOfRow = count;
     CGSize size = frame.size;
     size.height = size.width / count;
     frame.size = size;
-    DistImagePickerView *imagePickerV = [[DistImagePickerView alloc]initWithFrame:frame];
+    DistImagePickerView *imagePickerV = [[DistImagePickerView alloc] initWithFrame:frame];
     return imagePickerV;
 }
-
 
 - (void)reload {
     [self.collectionView reloadData];
@@ -220,6 +227,67 @@ static NSInteger countOfRow;
         };
     }
     return cell;
+}
+
+#pragma mark - add media action (outside method)
+- (void)addMedia {
+    if (_mediaArray.count >= _maxImageSelected) {
+        [UIAlertController showAlertWithTitle:[NSString stringWithFormat:@"最多只能选择%ld张",(long)_maxImageSelected] message:nil actionTitles:@[@"确定"] cancelTitle:nil style:UIAlertControllerStyleAlert completion:nil];
+        return;
+    }
+    
+    __weak typeof(self) weakSelf = self;
+    switch (_type) {
+        case DistImageTypePhoto:
+            [self openAlbum];
+            break;
+        case DistImageTypeCamera:
+            [self openCamera];
+            break;
+        case DistImageTypePhotoAndCamera:
+        {
+            [LLActionSheetView showActionSheetWithTitle:@"" cancelButtonTitle:@"取消" destructiveButtonTitle:@"拍照" otherButtonTitles:@[@"从相册选择照片"] handler:^(LLActionSheetView *actionSheet, NSInteger index) {
+                if (index == -1) {
+                    [weakSelf openCamera];
+                } else if(index == 1) {
+                    [weakSelf openAlbum];
+                }
+            }];
+        }
+            break;
+        case DistImageTypeVideoTape:
+            [self openVideoTape];
+            break;
+        case DistImageTypeVideo:
+            [self openVideo];
+            break;
+        case DistImageTypeVideoAndVideoTape:
+        {
+            [LLActionSheetView showActionSheetWithTitle:@"" cancelButtonTitle:@"取消" destructiveButtonTitle:@"拍摄视频" otherButtonTitles:@[@"从相册选择视频"] handler:^(LLActionSheetView *actionSheet, NSInteger index) {
+                if (index == -1) {
+                    [weakSelf openVideoTape];
+                } else if(index == 1) {
+                    [weakSelf openVideo];
+                }
+            }];
+        }
+            break;
+        default:
+        {
+            [LLActionSheetView showActionSheetWithTitle:@"" cancelButtonTitle:@"取消" destructiveButtonTitle:@"" otherButtonTitles:@[@"拍照", @"从相册选择照片", @"拍摄视频", @"从相册选择视频"] handler:^(LLActionSheetView *actionSheet, NSInteger index) {
+                if (index == 4) {
+                    [weakSelf openVideo];
+                }else if (index == 3){
+                    [weakSelf openVideoTape];
+                }else if (index == 2){
+                    [weakSelf openAlbum];
+                }else if (index == 1){
+                    [weakSelf openCamera];
+                }
+            }];
+        }
+            break;
+    }
 }
 
 #pragma mark - collection view delegate
@@ -308,6 +376,7 @@ static NSInteger countOfRow;
             [_photos addObject:photo];
         }
         [browser setCurrentPhotoIndex:indexPath.row];
+        [self viewController].navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStyleDone target:self action:nil];
         [[self viewController].navigationController pushViewController:browser animated:YES];
     }
 }
@@ -353,11 +422,11 @@ static NSInteger countOfRow;
         count = _maxImageSelected - _mediaArray.count;
     }
     TZImagePickerController *imagePickController = [[TZImagePickerController alloc] initWithMaxImagesCount:count delegate:self];
-    //是否 在相册中显示拍照按钮
+    // 是否 在相册中显示拍照按钮
     imagePickController.allowTakePicture = NO;
-    //是否可以选择显示原图
-    imagePickController.allowPickingOriginalPhoto = NO;
-    //是否 在相册中可以选择视频
+    // 是否可以选择显示原图
+    imagePickController.allowPickingOriginalPhoto = YES;
+    // 是否 在相册中可以选择视频
     imagePickController.allowPickingVideo = _allowPickingVideo;
     if (!_allowMultipleSelection) {
         imagePickController.selectedAssets = _selectedImageAssets;
@@ -378,8 +447,7 @@ static NSInteger countOfRow;
         picker.sourceType = sourceType;
         
         [[self viewController] presentViewController:picker animated:YES completion:nil];
-        
-    }else{
+    } else {
         [UIAlertController showAlertWithTitle:@"该设备不支持拍照" message:nil actionTitles:@[@"确定"] cancelTitle:nil style:UIAlertControllerStyleAlert completion:nil];
     }
 }
