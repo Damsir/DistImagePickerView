@@ -128,6 +128,7 @@ static NSInteger countOfRow;
         [temp addObject:model];
     }
     if (temp.count > 0) {
+        [_mediaArray removeAllObjects];
         [_mediaArray addObjectsFromArray:temp.copy];
         [self layoutCollection];
     }
@@ -183,13 +184,14 @@ static NSInteger countOfRow;
     
     if (indexPath.row == _mediaArray.count) {
         cell.icon.image = [UIImage imageNamed:@"LLImagePicker.bundle/AddMedia" inBundle:[NSBundle bundleForClass:self.class] compatibleWithTraitCollection:nil];
+        cell.icon.backgroundColor = [UIColor whiteColor];
         cell.videoImageView.hidden = YES;
         cell.deleteButton.hidden = YES;
     } else {
         DistImagePickerModel *model = [[DistImagePickerModel alloc]init];
         model = _mediaArray[indexPath.row];
         cell.videoImageView.hidden = !model.isVideo;
-        cell.deleteButton.hidden = !_showDelete;
+        cell.icon.backgroundColor = [UIColor colorWithRed:218/255.f green:235/255.f blue:226/255.f alpha:1.0];
         if (!model.isVideo && model.imageUrlString) {
             [cell.icon ll_setImageWithUrlString:model.imageUrlString placeholderImage:nil];
             cell.deleteButton.hidden = YES;
@@ -197,7 +199,9 @@ static NSInteger countOfRow;
             cell.icon.image = model.image;
             cell.deleteButton.hidden = NO;
         }
-        
+        if (!_showDelete) {
+            cell.deleteButton.hidden = !_showDelete;
+        }
         cell.DistClickDeleteButton = ^(NSIndexPath *cellIndexPath) {
             
             DistImagePickerModel *model = _mediaArray[cellIndexPath.row];
@@ -377,7 +381,9 @@ static NSInteger countOfRow;
         }
         [browser setCurrentPhotoIndex:indexPath.row];
         [self viewController].navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStyleDone target:self action:nil];
-        [[self viewController].navigationController pushViewController:browser animated:YES];
+        //        [[self viewController].navigationController pushViewController:browser animated:YES];
+        UINavigationController *navi = [[UINavigationController alloc] initWithRootViewController:browser];
+        [[self viewController] presentViewController:navi animated:YES completion:nil];
     }
 }
 
@@ -418,7 +424,7 @@ static NSInteger countOfRow;
     NSInteger count = 0;
     if (!_allowMultipleSelection) {
         count = _maxImageSelected - (_mediaArray.count - _selectedImageModels.count);
-    }else {
+    } else {
         count = _maxImageSelected - _mediaArray.count;
     }
     TZImagePickerController *imagePickController = [[TZImagePickerController alloc] initWithMaxImagesCount:count delegate:self];
@@ -433,6 +439,7 @@ static NSInteger countOfRow;
     }
     
     [[self viewController] presentViewController:imagePickController animated:YES completion:nil];
+    //    [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:imagePickController animated:YES completion:nil];
 }
 
 /** 相机 */
@@ -447,6 +454,7 @@ static NSInteger countOfRow;
         picker.sourceType = sourceType;
         
         [[self viewController] presentViewController:picker animated:YES completion:nil];
+        //        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:picker animated:YES completion:nil];
     } else {
         [UIAlertController showAlertWithTitle:@"该设备不支持拍照" message:nil actionTitles:@[@"确定"] cancelTitle:nil style:UIAlertControllerStyleAlert completion:nil];
     }
@@ -468,19 +476,20 @@ static NSInteger countOfRow;
     }
     
     [[self viewController] presentViewController:picker animated:YES completion:nil];
-    
+    //    [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:picker animated:YES completion:nil];
 }
 
 /** 视频 */
 - (void)openVideo {
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
     picker.delegate = self;
-    picker.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+    picker.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
     picker.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:picker.sourceType];
     picker.allowsEditing = YES;
     
     [[self viewController] presentViewController:picker animated:YES completion:nil];
+    //    [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:picker animated:YES completion:nil];
 }
 
 
@@ -633,6 +642,5 @@ static NSInteger countOfRow;
         }];
     }
 }
-
 
 @end
