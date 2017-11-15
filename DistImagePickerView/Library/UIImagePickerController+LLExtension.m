@@ -16,7 +16,7 @@
 
 #pragma mark -- 设置ImagePicker支持横屏(解决iPad只支持竖屏的情况)
 - (NSUInteger)supportedInterfaceOrientations {
-    return  UIInterfaceOrientationMaskAllButUpsideDown;
+    return  UIInterfaceOrientationMaskAll;
 }
 
 @end
