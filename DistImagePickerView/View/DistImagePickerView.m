@@ -383,6 +383,7 @@ static NSInteger countOfRow;
         [self viewController].navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStyleDone target:self action:nil];
         //        [[self viewController].navigationController pushViewController:browser animated:YES];
         UINavigationController *navi = [[UINavigationController alloc] initWithRootViewController:browser];
+        navi.modalPresentationStyle = UIModalPresentationFullScreen;
         [[self viewController] presentViewController:navi animated:YES completion:nil];
     }
 }
@@ -438,6 +439,7 @@ static NSInteger countOfRow;
         imagePickController.selectedAssets = _selectedImageAssets;
     }
     
+    imagePickController.modalPresentationStyle = UIModalPresentationFullScreen;
     [[self viewController] presentViewController:imagePickController animated:YES completion:nil];
     //    [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:imagePickController animated:YES completion:nil];
 }
@@ -453,6 +455,7 @@ static NSInteger countOfRow;
         picker.allowsEditing = YES;
         picker.sourceType = sourceType;
         
+        picker.modalPresentationStyle = UIModalPresentationFullScreen;
         [[self viewController] presentViewController:picker animated:YES completion:nil];
         //        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:picker animated:YES completion:nil];
     } else {
@@ -475,6 +478,7 @@ static NSInteger countOfRow;
         [UIAlertController showAlertWithTitle:@"当前设备不支持录像" message:nil actionTitles:@[@"确定"] cancelTitle:nil style:UIAlertControllerStyleAlert completion:nil];
     }
     
+    picker.modalPresentationStyle = UIModalPresentationFullScreen;
     [[self viewController] presentViewController:picker animated:YES completion:nil];
     //    [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:picker animated:YES completion:nil];
 }
@@ -488,6 +492,7 @@ static NSInteger countOfRow;
     picker.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:picker.sourceType];
     picker.allowsEditing = YES;
     
+    picker.modalPresentationStyle = UIModalPresentationFullScreen;
     [[self viewController] presentViewController:picker animated:YES completion:nil];
     //    [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:picker animated:YES completion:nil];
 }
